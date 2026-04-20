@@ -5,7 +5,10 @@ import com.example.bookstoreapi.dto.request.RegisterRequest;
 import com.example.bookstoreapi.dto.response.AuthResponse;
 import com.example.bookstoreapi.entity.Role;
 import com.example.bookstoreapi.entity.User;
+import com.example.bookstoreapi.exception.custom.EmailAlreadyExistsException;
+import com.example.bookstoreapi.exception.custom.InvalidCredentialsException;
 import com.example.bookstoreapi.repository.UserRepository;
+import com.example.bookstoreapi.security.JwtService;
 import com.example.bookstoreapi.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,11 +20,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email is already registered");
+            throw new EmailAlreadyExistsException("Email already exists");
         }
 
         User user = User.builder()
@@ -33,8 +37,10 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
+        String token = jwtService.generateToken(user.getEmail());
+
         return AuthResponse.builder()
-                .token(null)
+                .token(token)
                 .message("User registered successfully")
                 .email(user.getEmail())
                 .role(user.getRole().name())
@@ -44,14 +50,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new EmailAlreadyExistsException("Email already exists"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(user.getEmail());
+
         return AuthResponse.builder()
-                .token(null)
+                .token(token)
                 .message("Login successful")
                 .email(user.getEmail())
                 .role(user.getRole().name())

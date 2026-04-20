@@ -2,6 +2,7 @@ package com.example.bookstoreapi.controller;
 
 import com.example.bookstoreapi.dto.request.LoginRequest;
 import com.example.bookstoreapi.dto.request.RegisterRequest;
+import com.example.bookstoreapi.dto.response.ApiResponse;
 import com.example.bookstoreapi.dto.response.AuthResponse;
 import com.example.bookstoreapi.service.AuthService;
 import jakarta.validation.Valid;
@@ -18,14 +19,28 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse authResponse = authService.register(request);
+
+        ApiResponse<AuthResponse> response = ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("User registered successfully")
+                .data(authResponse)
+                .build();
+
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse authResponse = authService.login(request);
+
+        ApiResponse<AuthResponse> response = ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("Login successful")
+                .data(authResponse)
+                .build();
+
         return ResponseEntity.ok(response);
     }
 }
