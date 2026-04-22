@@ -11,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -23,9 +25,11 @@ public class AuthController {
         AuthResponse authResponse = authService.register(request);
 
         ApiResponse<AuthResponse> response = ApiResponse.<AuthResponse>builder()
-                .success(true)
+                .status("success")
+                .code(HttpStatus.CREATED.value())
                 .message("User registered successfully")
                 .data(authResponse)
+                .timestamp(Instant.now())
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -36,9 +40,11 @@ public class AuthController {
         AuthResponse authResponse = authService.login(request);
 
         ApiResponse<AuthResponse> response = ApiResponse.<AuthResponse>builder()
-                .success(true)
+                .status("success")
+                .code(HttpStatus.OK.value())
                 .message("Login successful")
                 .data(authResponse)
+                .timestamp(Instant.now())
                 .build();
 
         return ResponseEntity.ok(response);
