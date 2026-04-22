@@ -19,5 +19,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @EntityGraph(attributePaths = {"author", "categories"})
     Page<Book> findByAuthorIdAndCategoriesId(Long authorId, Long categoryId, Pageable pageable);
+
+    boolean existsByAuthorId(Long authorId);
 }
+
+
 

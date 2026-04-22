@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.bookstoreapi.dto.response.BookResponse;
 
 import java.time.Instant;
 import java.util.List;
@@ -51,6 +52,11 @@ public class AuthorController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         authorService.delete(id);
         return buildResponse(HttpStatus.OK, "Author deleted successfully", null);
+    }
+    @GetMapping("/{id}/books")
+    public ResponseEntity<ApiResponse<List<BookResponse>>> getBooksByAuthorId(@PathVariable Long id) {
+        List<BookResponse> books = authorService.getBooksByAuthorId(id);
+        return buildResponse(HttpStatus.OK, "Author books retrieved successfully", books);
     }
 
     private <T> ResponseEntity<ApiResponse<T>> buildResponse(HttpStatus status, String message, T data) {
