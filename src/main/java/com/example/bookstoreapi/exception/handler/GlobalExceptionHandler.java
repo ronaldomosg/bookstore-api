@@ -2,8 +2,11 @@ package com.example.bookstoreapi.exception.handler;
 
 import com.example.bookstoreapi.dto.response.ApiErrorResponse;
 import com.example.bookstoreapi.exception.custom.DuplicateResourceException;
+import com.example.bookstoreapi.exception.custom.InsufficientStockException;
 import com.example.bookstoreapi.exception.custom.InvalidCredentialsException;
+import com.example.bookstoreapi.exception.custom.InvalidOrderStateException;
 import com.example.bookstoreapi.exception.custom.ResourceNotFoundException;
+import com.example.bookstoreapi.exception.custom.UnauthorizedAccessException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +39,30 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), List.of(ex.getMessage()), request);
     }
 
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ApiErrorResponse> handleInsufficientStockException(
+            InsufficientStockException ex,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), List.of(ex.getMessage()), request);
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnauthorizedAccessException(
+            UnauthorizedAccessException ex,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), List.of(ex.getMessage()), request);
+    }
+
+    @ExceptionHandler(InvalidOrderStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidOrderStateException(
+            InvalidOrderStateException ex,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), List.of(ex.getMessage()), request);
+    }
+
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ApiErrorResponse> handleInvalidCredentialsException(
             InvalidCredentialsException ex,
@@ -55,7 +82,7 @@ public class GlobalExceptionHandler {
                 .map(this::formatFieldError)
                 .toList();
 
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Error de validación", errors, request);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Error de validacion", errors, request);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -65,8 +92,8 @@ public class GlobalExceptionHandler {
     ) {
         return buildErrorResponse(
                 HttpStatus.FORBIDDEN,
-                "No tiene permisos para esta operación",
-                List.of("No tiene permisos para esta operación"),
+                "No tiene permisos para esta operacion",
+                List.of("No tiene permisos para esta operacion"),
                 request
         );
     }
@@ -78,8 +105,8 @@ public class GlobalExceptionHandler {
     ) {
         return buildErrorResponse(
                 HttpStatus.UNAUTHORIZED,
-                "Autenticación requerida",
-                List.of("Autenticación requerida"),
+                "Autenticacion requerida",
+                List.of("Autenticacion requerida"),
                 request
         );
     }
