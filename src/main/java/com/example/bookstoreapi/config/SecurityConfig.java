@@ -50,6 +50,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/orders").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/orders").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/orders/my").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, "/orders/*/confirm").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, "/orders/*/cancel").hasRole("USER")
 
                         .anyRequest().authenticated()
                 )
