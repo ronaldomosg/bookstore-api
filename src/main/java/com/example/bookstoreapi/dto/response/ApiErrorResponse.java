@@ -5,18 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Map;
+import java.time.Instant;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ErrorResponse {
+public class ApiErrorResponse {
 
-    private boolean success;
+    private String status;
+    private int code;
     private String message;
-    private int status;
-    private LocalDateTime timestamp;
-    private Map<String, String> errors;
+    private List<String> errors;
+    private Instant timestamp;
+    private String path;
 }

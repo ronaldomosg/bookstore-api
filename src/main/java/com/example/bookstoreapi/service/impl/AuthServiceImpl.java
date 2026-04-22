@@ -5,7 +5,7 @@ import com.example.bookstoreapi.dto.request.RegisterRequest;
 import com.example.bookstoreapi.dto.response.AuthResponse;
 import com.example.bookstoreapi.entity.Role;
 import com.example.bookstoreapi.entity.User;
-import com.example.bookstoreapi.exception.custom.EmailAlreadyExistsException;
+import com.example.bookstoreapi.exception.custom.DuplicateResourceException;
 import com.example.bookstoreapi.exception.custom.InvalidCredentialsException;
 import com.example.bookstoreapi.repository.UserRepository;
 import com.example.bookstoreapi.security.JwtService;
@@ -25,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException("Email already exists");
+            throw new DuplicateResourceException("Email already exists: " + request.getEmail());
         }
 
         User user = User.builder()
@@ -41,8 +41,7 @@ public class AuthServiceImpl implements AuthService {
 
         return AuthResponse.builder()
                 .token(token)
-                .message("User registered successfully")
-                .email(user.getEmail())
+                .expiresIn(jwtService.getExpiration())
                 .role(user.getRole().name())
                 .build();
     }
@@ -50,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new EmailAlreadyExistsException("Email already exists"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid email or password");
@@ -60,8 +59,7 @@ public class AuthServiceImpl implements AuthService {
 
         return AuthResponse.builder()
                 .token(token)
-                .message("Login successful")
-                .email(user.getEmail())
+                .expiresIn(jwtService.getExpiration())
                 .role(user.getRole().name())
                 .build();
     }
