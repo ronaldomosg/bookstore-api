@@ -9,6 +9,7 @@ import com.example.bookstoreapi.exception.custom.ResourceNotFoundException;
 import com.example.bookstoreapi.exception.custom.UnauthorizedAccessException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import com.example.bookstoreapi.exception.custom.AuthorHasBooksException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -144,5 +145,12 @@ public class GlobalExceptionHandler {
 
     private String formatFieldError(FieldError fieldError) {
         return fieldError.getField() + ": " + fieldError.getDefaultMessage();
+    }
+    @ExceptionHandler(AuthorHasBooksException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthorHasBooksException(
+            AuthorHasBooksException ex,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), List.of(ex.getMessage()), request);
     }
 }
